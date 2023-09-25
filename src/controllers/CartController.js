@@ -38,21 +38,25 @@ const getUserCart = async (req, res) => {
 }
 
 const deleteCart = async (req, res) => {
-    const {cart_id} = req.params;
+    const { cart_id } = req.params;
 
     try {
         const findCart = await Cart.findById(cart_id);
-        if(!findCart){
-            res.status(200).send({msg: "Este Carrinho não existe"})
+        if (!findCart) {
+            return res.status(400).send({ msg: "Este Carrinho não existe" });
         }
 
         const deleteCart = await Cart.findByIdAndDelete(cart_id);
-        return res.status(200).send( deleteCart)
+        if (!deleteCart) {
+            return res.status(400).send({ msg: "Falha ao excluir o carrinho" });
+        }
 
+        return res.status(200).send(deleteCart);
     } catch (error) {
-        return res.status(400).send(error)
+        return res.status(400).send(error);
     }
 }
+
 
 module.exports = {
     addProductInCart,
