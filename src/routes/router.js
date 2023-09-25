@@ -10,6 +10,7 @@ routes.put("/products/:_id", ProductController.updateProd);
 routes.delete("/products/:_id", ProductController.deleteProd);
 
 routes.post("/auth/register", BuyerUserController.registerUser);
+routes.post("/auth/login", BuyerUserController.loginUser);
 routes.get("/users", BuyerUserController.getBuyerUser);
 routes.put("/users/:user_id", BuyerUserController.updateBuyerUser);
 routes.get("/users/:user_id", BuyerUserController.getBuyerUserByID);

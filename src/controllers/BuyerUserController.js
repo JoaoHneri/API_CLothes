@@ -1,5 +1,6 @@
 const buyerUser = require("../models/User");
 const bcrypt = require("bcrypt");
+const { response } = require("express");
 const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
@@ -55,8 +56,17 @@ const loginUser = async (req, res) => {
         return res.status(422).send({ msg:"Senha inválida, tente novamente"});
     }
 
-
+    try {
+        const secret = process.env.SECRET
+        const token = jwt.sign({
+            id: checkUserExists._id.toString,
+        }, secret, )
+        res.status(200).json({msg: "Autenticação realizada com sucesso", token});
+    } catch (error) {
+        return res.status(422).send(error)
+    }
 };
+
 
 const getBuyerUser = async (req, res) => {
   try {
@@ -98,4 +108,5 @@ module.exports = {
   getBuyerUser,
   updateBuyerUser,
   getBuyerUserByID,
+  loginUser
 };
