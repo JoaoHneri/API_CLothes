@@ -96,7 +96,7 @@ const updateBuyerUser = async (req, res) => {
 const getBuyerUserByID = async (req, res) => {
   const { user_id } = req.params;
   try {
-    const userById = await buyerUser.findById(user_id);
+    const userById = await buyerUser.findById(user_id, "-userPassword");
     return res.status(200).send(userById);
   } catch (error) {
     return res.status(400).send(error);
