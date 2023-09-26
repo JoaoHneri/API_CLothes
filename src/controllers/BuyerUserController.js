@@ -127,7 +127,22 @@ const getBuyerUserByID = async (req, res) => {
   }
 };
 
+const deleteBuyerUserByID = async (req, res) => {
 
+  const { user_id } = req.params;
+
+  const findUserById = await buyerUser.findById(user_id);
+  if(!findUserById){
+      return res.status(404).send("Usuário não encontrado, verifique se está logado ou se a conta existe.")
+  }
+
+  try {
+    const deltedUser = await buyerUser.findByIdAndDelete(user_id);
+    return res.status(200).send({msg:"Usuário deletado com sucesso"});
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+}
 
 module.exports = {
   registerUser,
@@ -135,4 +150,5 @@ module.exports = {
   updateBuyerUser,
   getBuyerUserByID,
   loginUser,
+  deleteBuyerUserByID
 };
