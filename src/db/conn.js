@@ -7,7 +7,7 @@ async function main(){
         await mongoose.connect(dbUri);
         console.log("Conectado com MongoDb");
     } catch (error) {
-        
+        console.log("Não foi possível conectar ao banco de dados MONGO");
     }
 }
 module.exports = main;

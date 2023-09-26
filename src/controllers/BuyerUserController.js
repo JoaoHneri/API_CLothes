@@ -1,21 +1,36 @@
 const buyerUser = require("../models/User");
 const bcrypt = require("bcrypt");
-const { response } = require("express");
 const jwt = require("jsonwebtoken");
+
+const enviarEmail = require("../services/nodemailer");
 
 const registerUser = async (req, res) => {
   const { userName, userUsername, userEmail, userPassword } = req.body;
 
-  if (!userUsername || !userName || !userEmail || !userPassword) {
-    return res.status(422).send({ msg: "Todos os campos são necessários" });
+  if (!userUsername) {
+    return res
+      .status(422)
+      .send({ msg: "O campo username deve ser preenchido" });
+  }
+
+  if (!userEmail) {
+    return res.status(422).send({ msg: "O campo email deve ser preenchido" });
+  }
+  if (!userPassword) {
+    return res
+      .status(422)
+      .send({ msg: "O campo password deve ser preenchido" });
+  }
+  if (!userName) {
+    return res.status(422).send({ msg: "O campo Nome deve ser preenchido" });
   }
 
   const userExist = await buyerUser.findOne({ userEmail: userEmail });
 
   if (userExist) {
-    return res
-      .status(422)
-      .send({ msg: "Usuário já existe, tente com outro email" });
+    return res.status(422).send({
+      msg: "Já existe um usuário cadastrado com esse email, por favor tente com outro",
+    });
   }
 
   //Introdução ao bcrypt
@@ -29,6 +44,8 @@ const registerUser = async (req, res) => {
       userEmail,
       userPassword: passwordHash,
     });
+    await enviarEmail(userEmail, userName)
+
     return res.status(200).json(user);
   } catch (error) {
     return res.status(400).json(error);
@@ -36,37 +53,44 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const {userEmail, userPassword} = req.body;
-    if(!userEmail){
-        return res.status(422).send({ msg:"O campo email deve ser preenchido"})
-    }
-    if(!userPassword){
-        return res.status(422).send({ msg:"O campo password deve ser preenchido"})
-    }
+  const { userEmail, userPassword } = req.body;
+  if (!userEmail) {
+    return res.status(422).send({ msg: "O campo email deve ser preenchido" });
+  }
+  if (!userPassword) {
+    return res
+      .status(422)
+      .send({ msg: "O campo password deve ser preenchido" });
+  }
 
-    const checkUserExists = await buyerUser.findOne({userEmail: userEmail})
+  const checkUserExists = await buyerUser.findOne({ userEmail: userEmail });
 
-    if(!checkUserExists){
-        return res.status(200).json({msg: "Usuário não existe, crie uma conta "})
-    }
+  if (!checkUserExists) {
+    return res.status(200).json({ msg: "Usuário não existe, crie uma conta " });
+  }
 
-    const checkPassword = await bcrypt.compare(userPassword,  checkUserExists.userPassword)
+  const checkPassword = await bcrypt.compare(
+    userPassword,
+    checkUserExists.userPassword
+  );
 
-    if(!checkPassword){
-        return res.status(422).send({ msg:"Senha inválida, tente novamente"});
-    }
+  if (!checkPassword) {
+    return res.status(422).send({ msg: "Senha inválida, tente novamente" });
+  }
 
-    try {
-        const secret = process.env.SECRET
-        const token = jwt.sign({
-            id: checkUserExists._id.toString,
-        }, secret, )
-        res.status(200).json({msg: "Autenticação realizada com sucesso", token});
-    } catch (error) {
-        return res.status(422).send(error)
-    }
+  try {
+    const secret = process.env.SECRET;
+    const token = jwt.sign(
+      {
+        id: checkUserExists._id.toString,
+      },
+      secret
+    );
+    res.status(200).json({ msg: "Autenticação realizada com sucesso", token });
+  } catch (error) {
+    return res.status(422).send(error);
+  }
 };
-
 
 const getBuyerUser = async (req, res) => {
   try {
@@ -103,10 +127,12 @@ const getBuyerUserByID = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   registerUser,
   getBuyerUser,
   updateBuyerUser,
   getBuyerUserByID,
-  loginUser
+  loginUser,
 };
