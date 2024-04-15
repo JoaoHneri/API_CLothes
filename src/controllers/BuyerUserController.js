@@ -1,17 +1,13 @@
 const buyerUser = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
+const verifyJwt = promisify(jwt.verify);
 
 const enviarEmail = require("../services/nodemailer");
 
 const registerUser = async (req, res) => {
-  const { userName, userUsername, userEmail, userPassword } = req.body;
-
-  if (!userUsername) {
-    return res
-      .status(422)
-      .send({ msg: "O campo username deve ser preenchido" });
-  }
+  const { userName, userEmail, userPassword } = req.body;
 
   if (!userEmail) {
     return res.status(422).send({ msg: "O campo email deve ser preenchido" });
@@ -37,20 +33,30 @@ const registerUser = async (req, res) => {
   const salt = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(userPassword, salt);
   //
+
   try {
     const user = await buyerUser.create({
       userName,
-      userUsername,
       userEmail,
       userPassword: passwordHash,
     });
-    await enviarEmail(userEmail, userName)
 
-    return res.status(200).json(user);
+    // Gerar token JWT incluindo o ID do usuário no payload
+    const secret = process.env.SECRET;
+    const token = jwt.sign(
+      {
+        id: user._id.toString(), // Incluir o ID do novo usuário no payload
+      },
+      secret
+    );
+
+    await enviarEmail(userEmail, userName);
+    return res.status(200).json({ msg: "Usuário registrado com sucesso", token, userId: user._id }); // Inclui o ID do usuário na resposta
   } catch (error) {
     return res.status(400).json(error);
   }
 };
+
 
 const loginUser = async (req, res) => {
   const { userEmail, userPassword } = req.body;
@@ -82,15 +88,18 @@ const loginUser = async (req, res) => {
     const secret = process.env.SECRET;
     const token = jwt.sign(
       {
-        id: checkUserExists._id.toString,
+        id: checkUserExists._id.toString(),
       },
       secret
     );
-    res.status(200).json({ msg: "Autenticação realizada com sucesso", token });
+
+    return res.status(200).json({ msg: "Autenticação realizada com sucesso", token, userId: checkUserExists._id }); // Inclui o ID do usuário na resposta
   } catch (error) {
     return res.status(422).send(error);
   }
 };
+
+
 
 const getBuyerUser = async (req, res) => {
   try {
@@ -128,21 +137,27 @@ const getBuyerUserByID = async (req, res) => {
 };
 
 const deleteBuyerUserByID = async (req, res) => {
-
   const { user_id } = req.params;
 
   const findUserById = await buyerUser.findById(user_id);
-  if(!findUserById){
-      return res.status(404).send("Usuário não encontrado, verifique se está logado ou se a conta existe.")
+  if (!findUserById) {
+    return res
+      .status(404)
+      .send(
+        "Usuário não encontrado, verifique se está logado ou se a conta existe."
+      );
   }
 
   try {
     const deltedUser = await buyerUser.findByIdAndDelete(user_id);
-    return res.status(200).send({msg:"Usuário deletado com sucesso"});
+    return res.status(200).send({ msg: "Usuário deletado com sucesso" });
   } catch (error) {
     return res.status(400).send(error);
   }
-}
+};
+
+
+
 
 module.exports = {
   registerUser,
@@ -150,5 +165,5 @@ module.exports = {
   updateBuyerUser,
   getBuyerUserByID,
   loginUser,
-  deleteBuyerUserByID
+  deleteBuyerUserByID,
 };

@@ -11,16 +11,16 @@ const produto = new Schema({
     type: Number,
     required: true,
   },
-  productColors: {
-    type: String,
-    require: false,
-  },
   productSizes: [
     {
       size: String, 
       quantity: Number,
     },
   ],
+  productCategory:{
+      type: String,
+      required: true,
+  },
   productDescription: {
     type: String,
     required: true,

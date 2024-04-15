@@ -14,6 +14,7 @@ routes.get("/", (req, res) => {
 })
 
 routes.get('/products', ProductController.getAll);
+routes.get('/products/category/:category', ProductController.getByCategory);
 routes.post('/products', ProductController.addProd);
 routes.get("/products/:_id", ProductController.getById);
 routes.put("/products/:_id", ProductController.updateProd);
@@ -25,6 +26,7 @@ routes.get("/users/:user_id", BuyerUserController.getBuyerUserByID);
 routes.get("/users", BuyerUserController.getBuyerUser);
 routes.put("/users/:user_id", BuyerUserController.updateBuyerUser);
 routes.delete("/users/:user_id", BuyerUserController.deleteBuyerUserByID);
+
 
 
 routes.post("/cart/:user_id", CartController.addProductInCart);
