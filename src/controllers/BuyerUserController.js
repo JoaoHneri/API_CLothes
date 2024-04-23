@@ -81,7 +81,8 @@ const loginUser = async (req, res) => {
   );
 
   if (!checkPassword) {
-    return res.status(422).send({ msg: "Senha inválida, tente novamente" });
+    return res.status(422).send({ msg: "Senha ou Email inválidos, tente novamente" });
+    
   }
 
   try {

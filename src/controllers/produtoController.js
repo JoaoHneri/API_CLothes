@@ -3,7 +3,11 @@ const Product = require("../models/Produto");
 const addProd = async (req, res) => {
   try {
     const { productName, productPrice,  productCategory, productSizes, productDescription,productQuantity } = req.body;
-    const Prods = await Product.create({ productName, productPrice,  productCategory, productSizes, productDescription,productQuantity });
+    const file = req.file.path;
+    if(!file) {
+      return res.status(400).send({message: "Imagem não foi enviada"})
+    }
+    const Prods = await Product.create({ productName, productPrice,  productCategory, productSizes, productDescription,productQuantity, src: file });
     return res.status(201).json(Prods);
   } catch (error) {
     return res.status(400).send(error);

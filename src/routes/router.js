@@ -4,7 +4,7 @@ const BuyerUserController = require("../controllers/BuyerUserController");
 const CartController = require("../controllers/CartController");
 const routes = Router()
 const checkToken = require("../middlewares/checkToken")
-
+const upload = require("../config/Multer")
 
 
 
@@ -15,7 +15,7 @@ routes.get("/", (req, res) => {
 
 routes.get('/products', ProductController.getAll);
 routes.get('/products/category/:category', ProductController.getByCategory);
-routes.post('/products', ProductController.addProd);
+routes.post('/products', upload.single("file"), ProductController.addProd);
 routes.get("/products/:_id", ProductController.getById);
 routes.put("/products/:_id", ProductController.updateProd);
 routes.delete("/products/:_id", ProductController.deleteProd);

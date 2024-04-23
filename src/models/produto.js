@@ -13,13 +13,13 @@ const produto = new Schema({
   },
   productSizes: [
     {
-      size: String, 
+      size: String,
       quantity: Number,
     },
   ],
-  productCategory:{
-      type: String,
-      required: true,
+  productCategory: {
+    type: String,
+    required: true,
   },
   productDescription: {
     type: String,
@@ -29,6 +29,8 @@ const produto = new Schema({
     type: Number,
     required: true,
   },
+  src: { type: String,
+     required: true },
 });
 
 module.exports = mongoose.model("Produto", produto);
