@@ -3,25 +3,37 @@ const User = require("../models/User");
 
 
 const addProductInCart = async (req, res) => {
-    const {products, userName} = req.body;
-    const {user_id} = req.params;
+    const { idProd } = req.body;
+    const { user_id } = req.params;
 
     try {
-        if(products == 0){
-            return res.status(404).send({message: "Carrinho não pode está vazio, verifique se há items"}) 
+        
+        const findUser = await User.findById(user_id);
+        if (!findUser) {
+            return res.status(404).send({ message: "Usuário não encontrado, verifique se está logado corretamente" });
         }
 
-        const findUser = await User.findById({_id: user_id});
-        if(!findUser){
-            return res.status(404).send({message: "Usuário não encontrado, verifique se está logado corretamente"})
+
+        const existingCart = await Cart.findOne({ userId: user_id, idProd });
+        
+        if (existingCart) {
+            return res.status(400).send({ message: "Este produto já está no carrinho do usuário" });
         }
 
-        const createCart = await Cart.create({products, userName: user_id})
+        if(!user_id || user_id === null){
+            return res.status(200).send({ message: "Usuário não encontrado, verifique se está logado corretamente" });
+        }
+
+        const createCart = await Cart.create({ userId: user_id, idProd });
         return res.status(200).send(createCart);
     } catch (error) {
-        return res.status(404).send(error);
+        console.error("Erro ao adicionar produto ao carrinho:", error);
+        return res.status(400).send({ message: "Ocorreu um erro ao adicionar o produto ao carrinho" });
     }
-}
+};
+
+
+
 
 
 const getUserCart = async (req, res) => {
