@@ -1,6 +1,6 @@
 const Cart = require("../models/Cart");
 const User = require("../models/User");
-
+const Product = require("../models/produto")
 
 const addProductInCart = async (req, res) => {
     const { idProd } = req.body;
@@ -37,17 +37,42 @@ const addProductInCart = async (req, res) => {
 
 
 const getUserCart = async (req, res) => {
-    const {user_id} = req.params;
+    const { user_id } = req.params;
+  
     try {
-        const findCartUser = await Cart.find({userName: user_id});
-        if(!findCartUser){
-            res.status(200).send({msg: "Usuário não possui items no carrinho"})
+      if (!user_id) {
+        return res.status(400).send({ message: "Usuário não encontrado, verifique se está logado corretamente" });
+      }
+  
+      const findUser = await User.findById(user_id);
+      if (!findUser) {
+        return res.status(404).send({ message: "Usuário não encontrado, verifique se está logado corretamente" });
+      }
+  
+      const findCartUser = await Cart.find({ userId: user_id });
+      if (!findCartUser || findCartUser.length === 0) {
+        return res.status(200).send({ msg: "Usuário não possui items no carrinho" });
+      }
+      
+      const cartProducts = [];
+  
+      for (const cartItem of findCartUser) {
+        const findProduct = await Product.findById(cartItem.idProd);
+        if (!findProduct) {
+          return res.status(404).send({ message: "Produto não encontrado" });
         }
-        return res.status(200).send(findCartUser)
+        cartProducts.push(findProduct, findProduct.productQuantity = 1);
+      }
+  
+      return res.status(200).json(cartProducts);
     } catch (error) {
-        return res.status(400).send(error)
+      return res.status(400).send(error);
     }
-}
+  };
+  
+
+
+
 
 const deleteCart = async (req, res) => {
     const { cart_id } = req.params;
