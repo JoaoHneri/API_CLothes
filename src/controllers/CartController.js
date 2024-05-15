@@ -61,7 +61,12 @@ const getUserCart = async (req, res) => {
         if (!findProduct) {
           return res.status(404).send({ message: "Produto não encontrado" });
         }
-        cartProducts.push(findProduct, findProduct.productQuantity = 1);
+        // Criar um objeto com as informações do produto e a quantidade definida como 1
+        const productWithQuantity = {
+          ...findProduct.toObject(), // Convertendo o documento do produto em um objeto JavaScript
+          productQuantity: 1 // Definindo a quantidade como 1
+        };
+        cartProducts.push(productWithQuantity);
       }
   
       return res.status(200).json(cartProducts);
@@ -73,30 +78,35 @@ const getUserCart = async (req, res) => {
 
 
 
-
-const deleteCart = async (req, res) => {
-    const { cart_id } = req.params;
-
+  const deleteItemCart = async (req, res) => {
+    const { user_id, cart_id } = req.params;
+  
     try {
-        const findCart = await Cart.findById(cart_id);
-        if (!findCart) {
-            return res.status(400).send({ msg: "Este Carrinho não existe" });
-        }
+      let findCartUser = await Cart.find({ userId: user_id });
+      if (!findCartUser || findCartUser.length === 0) {
+        return res.status(200).send({ msg: "Usuário não possui items no carrinho" });
+      }
+      
+      if(findCartUser.idProd === cart_id){
+        return res.status(400).send({ message: "Este produto já está no carrinho do usuário" });
+      }
 
-        const deleteCart = await Cart.findByIdAndDelete(cart_id);
-        if (!deleteCart) {
-            return res.status(400).send({ msg: "Falha ao excluir o carrinho" });
-        }
-
-        return res.status(200).send(deleteCart);
+      const deleted = await Cart.findOneAndDelete({idProd : cart_id})
+         if(deleted){
+          return res.status(200).send({msg: "Este produto foi retirado do carrinho do usuário"})
+        } 
+ 
     } catch (error) {
-        return res.status(400).send(error);
+      console.error("Erro ao excluir item do carrinho:", error);
+      return res.status(400).send({ message: "Ocorreu um erro ao excluir o item do carrinho" });
     }
-}
+  };
+  
+
 
 
 module.exports = {
     addProductInCart,
     getUserCart,
-    deleteCart
+    deleteItemCart
 }

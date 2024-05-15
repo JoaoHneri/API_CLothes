@@ -14,7 +14,6 @@ const produto = new Schema({
   productSizes: [
     {
       size: String,
-      quantity: Number,
     },
   ],
   productCategory: {

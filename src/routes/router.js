@@ -31,6 +31,6 @@ routes.delete("/users/:user_id", BuyerUserController.deleteBuyerUserByID);
 
 routes.post("/cart/:user_id", CartController.addProductInCart);
 routes.get("/cart/:user_id", CartController.getUserCart);
-routes.delete("/cart/:cart_id", CartController.deleteCart)
+routes.delete('/cart/:user_id/:cart_id', CartController.deleteItemCart);
 
 module.exports = routes
