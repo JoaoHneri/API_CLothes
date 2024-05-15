@@ -1,5 +1,6 @@
 const Payment = require("../models/PaymentModel")
 const User = require("../models/User");
+const Cart = require("../models/Cart");
 
 const addProdToPay = async (req, res) => {
     const { user_id } = req.params;
@@ -20,15 +21,18 @@ const addProdToPay = async (req, res) => {
             const { idProd, productName, productPrice, productSizes, productQuantity, src, status } = product;
             // Verifica se status está presente, se não estiver, atribui "Aguardando pagamento"
             const finalStatus = status || "Aguardando Pagamento";
-            return await Payment.create({ idProd, user_id, productName, productPrice, productSizes, productQuantity, src, status: finalStatus });
+            await Payment.create({ idProd, user_id, productName, productPrice, productSizes, productQuantity, src, status: finalStatus });
+            // Exclui os itens do carrinho que possuem os mesmos idProd e user_id do produto adicionado ao pagamento
+            await Cart.deleteMany({ idProd, user_id });
         }));
   
         return res.status(201).send(createdProducts); // Retorna a lista de produtos criados
     } catch (error) {
-        console.error("Erro ao adicionar produto(s) ao carrinho:", error);
-        return res.status(500).send({ message: "Ocorreu um erro ao adicionar o(s) produto(s) ao carrinho" });
+        console.error("Erro ao adicionar produto(s) ao pagamento:", error);
+        return res.status(500).send({ message: "Ocorreu um erro ao adicionar o(s) produto(s) ao pagamento" });
     }
-}
+};
+
 
 
   
