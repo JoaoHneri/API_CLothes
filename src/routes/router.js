@@ -38,6 +38,8 @@ routes.get("/payment/:user_id", PaymentController.getUserProdPay);
 routes.get("/payment/status/:user_id/:status", PaymentController.getUserProdPayByStatus); 
 
 routes.post("/register/admin", userAdminController.registerAdminUser);
+routes.post("/login/admin", userAdminController.loginAdminUser);
+routes.get("/getAdminUser/:user_id", userAdminController.getAdminUser);
 
 routes.post("/createOrder", PaymentMarketController.createOrder);
 
