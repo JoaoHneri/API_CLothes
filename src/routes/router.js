@@ -6,6 +6,9 @@ const routes = Router()
 const checkToken = require("../middlewares/checkToken")
 const upload = require("../config/Multer")
 const PaymentController = require("../controllers/PaymentController")
+const userAdminController = require("../controllers/UserAdminController");
+const PaymentMarketController = require("../controllers/PaymentMarket");
+
 
 
 routes.get("/", (req, res) => {
@@ -33,5 +36,14 @@ routes.delete('/cart/:_id', CartController.deleteItemCart);
 routes.post("/payment/:user_id", PaymentController.addProdToPay); 
 routes.get("/payment/:user_id", PaymentController.getUserProdPay); 
 routes.get("/payment/status/:user_id/:status", PaymentController.getUserProdPayByStatus); 
+
+routes.post("/register/admin", userAdminController.registerAdminUser);
+
+routes.post("/createOrder", PaymentMarketController.createOrder);
+
+routes.get("/success", (req, res) => {res.send("success!");});
+routes.get("/failure", (req, res) => {res.send("failure!");});
+routes.get("/pending", (req, res) => {res.send("pending");});
+routes.get("/success-payment/:user_id/:_id", PaymentMarketController.receiveWebhook);
 
 module.exports = routes
