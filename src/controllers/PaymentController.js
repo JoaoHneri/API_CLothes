@@ -80,8 +80,29 @@ const getUserProdPayByStatus = async (req, res) => {
 }
 
 
+const getProdsToSend = async (req, res) => {
+    const { status } = req.params;
+
+    try {
+        const findProds = await Payment.find({ status });
+        if (findProds.length === 0) {
+            return res.status(404).send({ message: "Nenhum item encontrado com o status fornecido" });
+        }
+      
+        // Retorna os itens do carrinho com o status fornecido
+        return res.status(200).send(findProds);
+    } catch (error) {
+        console.error("Erro ao buscar produtos por status:", error);
+        return res.status(500).send({ message: "Ocorreu um erro ao buscar os produtos por status" });
+    }
+}
+
+
+
+
 module.exports = {
     addProdToPay,
     getUserProdPay,
-    getUserProdPayByStatus
+    getUserProdPayByStatus,
+    getProdsToSend
 }

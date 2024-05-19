@@ -8,7 +8,7 @@ const upload = require("../config/Multer")
 const PaymentController = require("../controllers/PaymentController")
 const userAdminController = require("../controllers/UserAdminController");
 const PaymentMarketController = require("../controllers/PaymentMarket");
-
+const EnderecoController = require("../controllers/EnderecoController");
 
 
 routes.get("/", (req, res) => {
@@ -36,6 +36,7 @@ routes.delete('/cart/:_id', CartController.deleteItemCart);
 routes.post("/payment/:user_id", PaymentController.addProdToPay); 
 routes.get("/payment/:user_id", PaymentController.getUserProdPay); 
 routes.get("/payment/status/:user_id/:status", PaymentController.getUserProdPayByStatus); 
+routes.get("/payment/send/status/:status", PaymentController.getProdsToSend); 
 
 routes.post("/register/admin", userAdminController.registerAdminUser);
 routes.post("/login/admin", userAdminController.loginAdminUser);
@@ -47,5 +48,10 @@ routes.get("/success", (req, res) => {res.send("success!");});
 routes.get("/failure", (req, res) => {res.send("failure!");});
 routes.get("/pending", (req, res) => {res.send("pending");});
 routes.get("/success-payment/:user_id/:_id", PaymentMarketController.receiveWebhook);
+
+
+routes.post("/address/:user_id", EnderecoController.addEndereco);
+routes.get("/address/user/:user_id", EnderecoController.getUserEndereco);
+routes.delete("/address/user/:address_id", EnderecoController.deleteUserEndereco);
 
 module.exports = routes
