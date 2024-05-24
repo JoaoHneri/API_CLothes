@@ -19,7 +19,7 @@ routes.get('/products', ProductController.getAll);
 routes.get('/products/category/:category', ProductController.getByCategory);
 routes.post('/products', upload.single("file"), ProductController.addProd);
 routes.get("/products/:_id", ProductController.getById);
-routes.put("/products/:_id", ProductController.updateProd);
+routes.put("/products/:_id", upload.single('file'), ProductController.updateProd);
 routes.delete("/products/:_id", ProductController.deleteProd);
 
 routes.post("/auth/register", BuyerUserController.registerUser);
@@ -33,15 +33,17 @@ routes.post("/cart/:user_id", CartController.addProductInCart);
 routes.get("/cart/:user_id", CartController.getUserCart);
 routes.delete('/cart/:_id', CartController.deleteItemCart);
 
+routes.get("/payment/prod/:_id", PaymentController.getPaymentProd); 
+routes.post("/payment/prod/code/:_id/:codRastreio/:idAdmin", PaymentController.sendAndCode); 
 routes.post("/payment/:user_id", PaymentController.addProdToPay); 
 routes.get("/payment/:user_id", PaymentController.getUserProdPay); 
 routes.get("/payment/status/:user_id/:status", PaymentController.getUserProdPayByStatus); 
 routes.get("/payment/send/status/:status", PaymentController.getProdsToSend); 
+routes.get("/payment/send/complete/:_id", PaymentController.concludPayment); 
 
 routes.post("/register/admin", userAdminController.registerAdminUser);
 routes.post("/login/admin", userAdminController.loginAdminUser);
 routes.get("/getAdminUser/:user_id", userAdminController.getAdminUser);
-
 routes.post("/createOrder", PaymentMarketController.createOrder);
 
 routes.get("/success", (req, res) => {res.send("success!");});

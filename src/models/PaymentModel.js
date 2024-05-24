@@ -34,6 +34,10 @@ const PaymentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  codRastreio:{
+    type: String,
+    required: false
+  }
 });
 
 

@@ -61,15 +61,47 @@ const getById = async (req, res) => {
   };
   
   const updateProd = async (req, res) => {
-    const { _id } = req.params;
     try {
-      const { productName, productPrice, productCategory, productSizes, productDescription,productQuantity } = req.body;
-      const updatedProds = await Product.findByIdAndUpdate(_id, { productName, productPrice, productCategory, productSizes, productDescription,productQuantity });
-      return res.status(201).json({msg: `Produto Atualizado com sucesso: ${updatedProds}`});
+      const { _id } = req.params;
+      const { productName, productPrice, productCategory, productSizes, productDescription, productQuantity } = req.body;
+      const file = req.file.path;
+      
+      if (!file) {
+        return res.status(400).send({ message: "Imagem não foi enviada" });
+      }
+  
+      const product = await Product.findById(_id);
+      if (!product) {
+        return res.status(404).send({ message: "Produto não encontrado" });
+      }
+  
+      // Atualiza os campos do produto
+      product.productName = productName;
+      product.productPrice = productPrice;
+      product.productCategory = productCategory;
+      
+      // Converte cada tamanho em um objeto com as propriedades "size" e "_id"
+      product.productSizes = productSizes.map(size => ({ size }));
+  
+      product.productDescription = productDescription;
+      product.productQuantity = productQuantity;
+      product.src = file;
+  
+      await product.save();
+  
+      // Retorna o produto atualizado
+      return res.status(200).json(product);
     } catch (error) {
       return res.status(400).send(error);
     }
   };
+  
+  
+  
+  
+
+
+
 
   const deleteProd = async (req, res) => {
     const { _id } = req.params;

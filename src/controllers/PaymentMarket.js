@@ -4,12 +4,19 @@ const mercadopago = require("mercadopago");
 const userAdmin = require('../models/UserAdmin');
 const Product = require("../models/produto");
 const Payment = require("../models/PaymentModel")
-
+const Endereco = require("../models/Endereco");
 
 
 const createOrder = async (req, res) => {
   const { MercadoPagoConfig, Preference } = mercadopago;
   const { title, quantity, unitPrice, _id, user_id } = req.body;
+
+
+  const UserEnderecoExist = await Endereco.findOne({user_id: user_id});
+
+  if (!UserEnderecoExist) {
+    return res.status(400).send({ message: "Endereço não encontrado, adicione um endereço de entrega antes de efetuar um pagamento" });
+  }
 
   const client = new MercadoPagoConfig({
     accessToken:
