@@ -124,9 +124,11 @@ const getAdminUser = async (req, res) => {
     const usersLength = await userBuy.countDocuments();
     const totalOrders = await paymentModel.countDocuments();
     const user = await userAdmin.findById(user_id);
+    const PaymentEnviado = await paymentModel.find({status: 'Aguardando Envio'}).countDocuments();
+    
     if (user) {
       const { userName, isAdmin, Rent, Orders } = user;
-      return res.status(200).json({ userName, isAdmin, Rent, Orders, usersLength, totalOrders });
+      return res.status(200).json({ userName, isAdmin, Rent, Orders: PaymentEnviado, usersLength, totalOrders });
     } else {
       return res.status(404).json({ msg: "Usuário não encontrado" });
     }
